@@ -27,8 +27,82 @@ poap_api_key = os.getenv("POAP_API_KEY")
 poap_access_token = os.getenv("POAP_ACCESS_TOKEN")
 eventbrite_auth_token = os.getenv("EVENTBRITE_API_KEY")
 
+MINT_POAP_PROMPT = """
+This tool mints a POAP to an attendee using the POAP API. It requires the attendee's address (Ethereum address, ENS, or email), the claim code (qr_hash), and the claim secret.
+Always make sure to get valid claim code and claim secret before trying to mint the POAP.
+Questions that can trigger this tool include:
+- "Mint a POAP to attendee@example.com using claim code xyz123 and secret abc456."
+- "I want to mint a POAP to attendee@example.com with qr_hash abc123 and secret xyz789."
+"""
+
+
+class MintPoapInput(BaseModel):
+    """Input argument schema for minting a POAP."""
+
+    address: str = Field(
+        ...,
+        description="The attendee's email address. Example: 'attendee@example.com'.",
+        example="attendee@example.com",
+    )
+    qr_hash: str = Field(
+        ...,
+        description="The QR hash (claim code) for the POAP. Example: 'abc123def456'.",
+        example="abc123def456",
+    )
+    secret: str = Field(
+        ...,
+        description="The claim secret for the POAP. Example: '1997efc56b68f5725e6737a3452d5da0c0dea497a5adff70c92f89755f266fa5'.",
+        example="1997efc56b68f5725e6737a3452d5da0c0dea497a5adff70c92f89755f266fa5",
+    )
+
+
+def mint_poap(address: str, qr_hash: str, secret: str) -> str:
+    """
+    Mint a POAP to an attendee using the POAP API.
+
+    Args:
+        address (str): The attendee's email address.
+        qr_hash (str): The QR hash (claim code) for the POAP.
+        secret (str): The claim secret for the POAP.
+
+    Returns:
+        str: A response string with minting details or an error message.
+    """
+
+    # Load credentials from environment variables
+    poap_api_key = os.getenv("POAP_API_KEY")
+    poap_access_token = os.getenv("POAP_ACCESS_TOKEN")
+
+    # Endpoint and headers
+    url = "https://api.poap.tech/actions/claim-qr"
+    headers = {
+        "Authorization": f"Bearer {poap_access_token}",
+        "X-API-Key": poap_api_key,
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+    }
+
+    # Request payload
+    payload = {
+        "sendEmail": True,
+        "address": address,
+        "qr_hash": qr_hash,
+        "secret": secret,
+    }
+
+    # Make the API call
+    response = requests.post(url, headers=headers, json=payload)
+
+    # Process the response
+    if response.status_code == 200:
+        return f"POAP minted successfully: {response.json()}"
+    else:
+        return f"Failed to mint POAP. Status Code: {response.status_code}. Error: {response.json()}"
+
+
 GET_CLAIM_SECRET_PROMPT = """
 This tool retrieves the claim secret for a POAP QR hash using the POAP API.
+Always make sure to get valid claim code ie qr_hash.
 Questions that can trigger this tool include:
 - "Get the claim secret for the QR hash abc123def456."
 - "Retrieve the claim secret for the hash xyz789abc012."
@@ -81,6 +155,7 @@ def get_claim_secret(qr_hash: str) -> str:
 
 GET_CLAIM_CODES_PROMPT = """
 This tool retrieves claim codes (QR hashes) for a POAP event using the POAP API.
+Always make sure to get POAP event ID.
 Questions that can trigger this tool include:
 - "Get the claim codes for POAP event ID 182857 with the secret code 517278."
 - "Retrieve the QR hashes for event 12345 with the code 987654."
@@ -140,8 +215,11 @@ def get_claim_codes(event_id: str, secret_code: str) -> str:
 # Define a new tool for retrieving an Eventbrite event.
 RETRIEVE_EVENT_PROMPT = """
 This tool retrieves an Eventbrite event using the Eventbrite API.
-So a question like, give me the event details for the event with event ID 1246643,
-what is the event for ID 12345, get or retrieve the event details for ID 12342 etc.
+Always make sure to get Eventbrite event ID.
+You can ask questions like:
+- "Get the the event details for the event with event ID 1246643."
+- "What is the event for ID 12345."
+- "Retrieve the event details for ID 12342."
 """
 
 
@@ -181,6 +259,7 @@ def retrieve_event(event_id: str) -> str:
 
 LIST_ATTENDEES_PROMPT = """
 This tool retrieves a list of attendees for an Eventbrite event using the Eventbrite API.
+Always make sure to get Eventbrite event ID.
 You can ask questions like:
 - "Get the attendees for event ID 12345."
 - "List all attendees for the event with ID 67890."
@@ -297,6 +376,16 @@ def initialize_agent():
 
     all_tools = tools.append(getClaimSecretTool)
 
+    mintPoapTool = CdpTool(
+        name="mint_poap",
+        description=MINT_POAP_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=MintPoapInput,
+        func=mint_poap,
+    )
+
+    all_tools = tools.append(mintPoapTool)
+
     # Store buffered conversation history in memory.
     memory = MemorySaver()
     config = {"configurable": {"thread_id": "CDP Agentkit Chatbot Example!"}}
@@ -307,7 +396,7 @@ def initialize_agent():
             llm,
             tools=tools,
             checkpointer=memory,
-            state_modifier="You are a helpful agent that can create eventbrite events and manage those events using eventbrite APIs. You rely on the Coinbase Developer Platform Agentkit to help you perform your tasks. You can also interact with the POAP API and send POAPs which are NFTs to verified attendees of Eventbrite events by sending a unique POAP mint link to the associated email addresses of all verified event attendees. You are empowered to interact with these external APIs using your tools. If someone asks you to do something you can't do with your currently available tools, you must say so, and encourage them to implement it themselves using the CDP SDK + Agentkit, recommend they go to docs.cdp.coinbase.com for more informaton. Be concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested.",
+            state_modifier="You are a helpful agent that can manage eventbrite events using eventbrite APIs. You rely on the Coinbase Developer Platform Agentkit to help you perform your tasks. You can also interact with the POAP API and send POAPs which are NFTs to verified attendees of Eventbrite events through the associated email addresses of all verified event attendees. You are empowered to interact with these external APIs using your tools. If someone asks you to do something you can't do with your currently available tools, you must say so, and encourage them to implement it themselves using the CDP SDK + Agentkit, recommend they go to docs.cdp.coinbase.com for more informaton. Be concise and helpful with your responses. Refrain from restating your tools' descriptions unless it is explicitly requested.",
         ),
         config,
     )
