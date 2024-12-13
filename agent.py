@@ -12,6 +12,9 @@ from cdp_langchain.agent_toolkits import CdpToolkit
 from cdp_langchain.utils import CdpAgentkitWrapper
 from cdp_langchain.tools import CdpTool
 from langgraph.prebuilt import create_react_agent
+
+import logging
+
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, Field
 from cdp import *
@@ -155,7 +158,7 @@ def get_claim_secret(qr_hash: str) -> str:
 
 GET_CLAIM_CODES_PROMPT = """
 This tool retrieves claim codes (QR hashes) for a POAP event using the POAP API.
-Always make sure to get POAP event ID.
+Always make sure to get POAP event ID and the claim secret.
 Questions that can trigger this tool include:
 - "Get the claim codes for POAP event ID 182857 with the secret code 517278."
 - "Retrieve the QR hashes for event 12345 with the code 987654."
@@ -241,7 +244,7 @@ def retrieve_event(event_id: str) -> str:
         event_id (str): The ID of the event to retrieve.
 
     Returns:
-        str: A response string with event details or an error message.
+        str: A formatted response string with event details or an error message.
     """
     url = f"https://www.eventbriteapi.com/v3/events/{event_id}/"
     headers = {
@@ -252,9 +255,28 @@ def retrieve_event(event_id: str) -> str:
     response = requests.get(url, headers=headers)
 
     if response.status_code == 200:
-        return f"Event retrieved successfully: {response.json()}"
+        event_data = response.json()
+        # Extract relevant details
+        event_name = event_data.get("name", {}).get("text", "No name available")
+        event_description = event_data.get("description", {}).get(
+            "text", "No description available"
+        )
+        event_url = event_data.get("url", "No URL available")
+        start_time = event_data.get("start", {}).get("local", "No start time available")
+        end_time = event_data.get("end", {}).get("local", "No end time available")
+
+        # Format the message
+        return (
+            f"Here are the details of the event:\n"
+            f"Name: {event_name}\n"
+            f"Description: {event_description}\n"
+            f"URL: {event_url}\n"
+            f"Start Time (Local): {start_time}\n"
+            f"End Time (Local): {end_time}\n"
+        )
     else:
-        return f"Failed to retrieve event. Status Code: {response.status_code}. Error: {response.json()}"
+        error_message = response.json().get("error_description", "Unknown error")
+        return f"Failed to retrieve event. Status Code: {response.status_code}. Error: {error_message}"
 
 
 LIST_ATTENDEES_PROMPT = """
@@ -390,7 +412,6 @@ def initialize_agent():
     memory = MemorySaver()
     config = {"configurable": {"thread_id": "CDP Agentkit Chatbot Example!"}}
 
-    # Create ReAct Agent using the LLM and CDP Agentkit tools.
     return (
         create_react_agent(
             llm,

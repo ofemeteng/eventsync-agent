@@ -86,16 +86,15 @@ CDP_API_KEY_NAME=your_cdp_api_key_name
 CDP_API_KEY_PRIVATE_KEY=your_cdp_api_key_private_key
 ```
 
-### Running the Agent
+
+### Running the Web Application and Embedded Agent
 
 ```bash
 poetry shell
-python agent.py
+uvicorn server:app --reload 
 ```
+The application will be accessible at http:localhost:8000
 
-Choose between:
-- `chat`: Interactive mode
-- `auto`: Autonomous action mode
 
 ## 🌟 Future Roadmap
 

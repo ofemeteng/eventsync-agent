@@ -17,6 +17,8 @@ cdp-sdk = "^0.10.0"
 python-dotenv = "^1.0.1"
 langchain-community = "^0.3.11"
 requests = "^2.32.3"
+fastapi = "^0.115.6"
+uvicorn = "^0.32.1"
 
 [build-system]
 requires = ["poetry-core"]
