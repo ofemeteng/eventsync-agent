@@ -17,7 +17,7 @@ import logging
 
 from langchain_core.messages import HumanMessage
 from pydantic import BaseModel, Field
-from cdp import *
+from cdp_sdk import Wallet
 
 # Load environment variables from .env file
 load_dotenv()
