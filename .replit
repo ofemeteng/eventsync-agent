@@ -1,5 +1,5 @@
 modules = ["python-3.12"]
-run = "poetry run python server.py"
+run = "uvicorn server:app --host 0.0.0.0 --port 80"
 disableGuessImports = true
 
 
@@ -7,4 +7,7 @@ disableGuessImports = true
 channel = "stable-24_05"
 
 [deployment]
-run = ["poetry run python server.py"]
+run = ["uvicorn server:app --host 0.0.0.0 --port 80"]
+
+[[ports]]
+localPort = 80

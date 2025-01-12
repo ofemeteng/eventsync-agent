@@ -421,6 +421,19 @@ doc = ["Sphinx (>=7)", "packaging", "sphinx-autodoc-typehints (>=1.2.0)", "sphin
 test = ["coverage (>=7)", "hypothesis", "pytest"]
 
 [[package]]
+name = "cdp"
+version = "0.0.2"
+description = "Change Directory Plus"
+optional = false
+python-versions = "*"
+files = [
+    {file = "cdp-0.0.2.tar.gz", hash = "sha256:92fa51d74d12695ab744d9c5ebe00057110df5dc47d6405440933fd7a2f19526"},
+]
+
+[package.dependencies]
+scandir = "*"
+
+[[package]]
 name = "cdp-agentkit-core"
 version = "0.0.4"
 description = "CDP Agentkit core primitives"
@@ -1837,13 +1850,13 @@ langgraph-sdk = ">=0.1.32,<0.2.0"
 
 [[package]]
 name = "langgraph-checkpoint"
-version = "2.0.2"
+version = "2.0.9"
 description = "Library with base interfaces for LangGraph checkpoint savers."
 optional = false
 python-versions = "<4.0.0,>=3.9.0"
 files = [
-    {file = "langgraph_checkpoint-2.0.2-py3-none-any.whl", hash = "sha256:6e5dfd90e1fc71b91ccff75939ada1114e5d7f824df5f24c62d39bed69039ee2"},
-    {file = "langgraph_checkpoint-2.0.2.tar.gz", hash = "sha256:c1d033e4e4855f580fa56830327eb86513b64ab5be527245363498e76b19a0b9"},
+    {file = "langgraph_checkpoint-2.0.9-py3-none-any.whl", hash = "sha256:b546ed6129929b8941ac08af6ce5cd26c8ebe1d25883d3c48638d34ade91ce42"},
+    {file = "langgraph_checkpoint-2.0.9.tar.gz", hash = "sha256:43847d7e385a2d9d2b684155920998e44ed42d2d1780719e4f6111fe3d6db84c"},
 ]
 
 [package.dependencies]
@@ -2859,6 +2872,26 @@ rust-backend = ["rusty-rlp (>=0.2.1)"]
 test = ["hypothesis (==5.19.0)", "pytest (>=7.0.0)", "pytest-xdist (>=2.4.0)"]
 
 [[package]]
+name = "scandir"
+version = "1.10.0"
+description = "scandir, a better directory iterator and faster os.walk()"
+optional = false
+python-versions = "*"
+files = [
+    {file = "scandir-1.10.0-cp27-cp27m-win32.whl", hash = "sha256:92c85ac42f41ffdc35b6da57ed991575bdbe69db895507af88b9f499b701c188"},
+    {file = "scandir-1.10.0-cp27-cp27m-win_amd64.whl", hash = "sha256:cb925555f43060a1745d0a321cca94bcea927c50114b623d73179189a4e100ac"},
+    {file = "scandir-1.10.0-cp34-cp34m-win32.whl", hash = "sha256:2c712840c2e2ee8dfaf36034080108d30060d759c7b73a01a52251cc8989f11f"},
+    {file = "scandir-1.10.0-cp34-cp34m-win_amd64.whl", hash = "sha256:2586c94e907d99617887daed6c1d102b5ca28f1085f90446554abf1faf73123e"},
+    {file = "scandir-1.10.0-cp35-cp35m-win32.whl", hash = "sha256:2b8e3888b11abb2217a32af0766bc06b65cc4a928d8727828ee68af5a967fa6f"},
+    {file = "scandir-1.10.0-cp35-cp35m-win_amd64.whl", hash = "sha256:8c5922863e44ffc00c5c693190648daa6d15e7c1207ed02d6f46a8dcc2869d32"},
+    {file = "scandir-1.10.0-cp36-cp36m-win32.whl", hash = "sha256:2ae41f43797ca0c11591c0c35f2f5875fa99f8797cb1a1fd440497ec0ae4b022"},
+    {file = "scandir-1.10.0-cp36-cp36m-win_amd64.whl", hash = "sha256:7d2d7a06a252764061a020407b997dd036f7bd6a175a5ba2b345f0a357f0b3f4"},
+    {file = "scandir-1.10.0-cp37-cp37m-win32.whl", hash = "sha256:67f15b6f83e6507fdc6fca22fedf6ef8b334b399ca27c6b568cbfaa82a364173"},
+    {file = "scandir-1.10.0-cp37-cp37m-win_amd64.whl", hash = "sha256:b24086f2375c4a094a6b51e78b4cf7ca16c721dcee2eddd7aa6494b42d6d519d"},
+    {file = "scandir-1.10.0.tar.gz", hash = "sha256:4d4631f6062e658e9007ab3149a9b914f3548cb38bfb021c64f39a025ce578ae"},
+]
+
+[[package]]
 name = "six"
 version = "1.16.0"
 description = "Python 2 and 3 compatibility utilities"
@@ -3396,4 +3429,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.11"
-content-hash = "14ece2eb222bfef345fb3b0efcea7fbcec80c78c915265dc34aa8de6d90dfbb5"
+content-hash = "b249a691898d39ae06ead98850bc99d37f74e31d2a5e1f1d578c2f80aa9e9bdd"
