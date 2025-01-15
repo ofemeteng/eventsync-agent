@@ -1,3 +1,4 @@
 .env
 wallet_data_sepolia.txt
 __pycache__
+__pycache__/agent.cpython-311.pyc

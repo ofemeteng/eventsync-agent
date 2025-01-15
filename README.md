@@ -1,13 +1,21 @@
-# 🚀 EventSync: Autonomous Web2 & Web3 Event Management Agent
+# 🚀 EventSync: The Ultimate Web2 & Web3 Event Management Agent
 
-## 🏆 Gaia Autonomous Hackathon Submission
-### Agent Integrations Track | Coinbase Developer Platform Bounty
+## 🏆 Round 3 CDP Builder Grants Submission | AgentKit Edition
+*Building on our success as winners of the Best CDP AgentKit Integration (Coinbase Developer Platform Bounty) at the [Gaia Autonomous Hackathon (December 2024)](https://www.gaianet.ai/blog/gaia-first-autonomous-hackathon)*
 
-![Agent Integration Showcase](https://placeholder.com/agent-integration-banner)
+![Agent Integration Showcase](./images/eventsync.png)
 
-## 🌐 Project Overview
+## 🌟 What's New
 
-**EventSync** is a groundbreaking AI agent that seamlessly bridges Web2 and Web3 event ecosystems, leveraging the Coinbase Developer Platform's AgentKit to create a fully autonomous event management solution.
+EventSync has evolved significantly since its hackathon debut, with major improvements including:
+- 🎨 Brand new sleek frontend interface ([EventSync Frontend](https://github.com/ofemeteng/eventsync-frontend))
+- 🛠 Expanded toolkit with new AgentKit actions
+- 🤖 Enhanced autonomous capabilities
+- 🔄 Seamless Web2 to Web3 integration
+
+## 🎯 Project Overview
+
+**EventSync** is a groundbreaking AI agent that seamlessly bridges Web2 and Web3 event ecosystems, leveraging the [Coinbase Developer Platform's AgentKit](https://docs.cdp.coinbase.com/agentkit/docs/welcome), [Proof of Attendance Protocol (POAP) NFTs](https://poap.xyz) and [Eventbrite](https://www.eventbrite.com) to create a fully autonomous event management solution.
 
 ### 🔑 Key Innovations
 
@@ -24,24 +32,34 @@
 - **POAP API**: Decentralized proof-of-attendance NFT minting
 - **LangChain & LangGraph**: Powering intelligent agent interactions
 
-### Unique Technical Features
+### 🔑 Why EventSync Stands Out
 
-1. **Multi-API Integration**
-   - Dynamically retrieves event details from Eventbrite
-   - Fetches and manages POAP claim codes
-   - Autonomously mints NFTs to verified attendees
+1. **End-User Focused**
+   - No crypto wallet required
+   - Email-based NFT distribution
+   - Familiar Web2 interface for Web3 actions
 
-2. **Wallet-Less NFT Distribution**
-   - Email-based POAP minting
-   - Removes blockchain entry barriers
-   - Enables Web3 participation for non-crypto users
+2. **Comprehensive Event Management**
+   - Create and manage Eventbrite events
+   - Automatic POAP NFT minting
+   - Attendee tracking and verification
 
-3. **Autonomous Agent Capabilities**
-   - Can operate in chat or fully autonomous modes
-   - Dynamically selects and executes blockchain actions
-   - Adaptable to various event management scenarios
+3. **AgentKit Integration**
+   - Custom actions for event management
+   - Autonomous decision-making
+   - Seamless blockchain interactions
 
-## 🔗 Agent Workflow
+### Available Agent Tools
+```python
+- createEventbriteTool # Create new events
+- retrieveEventTool     # Fetch event details
+- listAttendeesTool     # Get event attendees
+- getClaimCodesTool     # Generate POAP claim codes
+- getClaimSecretTool    # Manage claim secrets
+- mintPoapTool         # Mint POAPs for attendees
+```
+
+### Agent Workflow
 
 ```mermaid
 graph TD
@@ -51,34 +69,50 @@ graph TD
     D --> E[Mint POAP NFTs to Attendees Email]
 ```
 
-## 💡 Coinbase Developer Platform Bounty Alignment
+## 💫 Key Features
 
-### Criteria Fulfillment
-- ✅ Uses AgentKit as primary driver for onchain transactions
-- ✅ End-user focused application
-- ✅ Seamless Web2 and Web3 functionality
-- ✅ Enables significant agent autonomy
+### For Event Organizers
+- One-click event creation
+- Automatic POAP distribution
+- Attendee management
+- Real-time event analytics
+
+### For Attendees
+- Seamless NFT claiming
+- No crypto knowledge required
+- Email-based verification
+- Digital proof of attendance
 
 ## 🚀 Getting Started
 
 ### Prerequisites
+```bash
 - Coinbase Developer Platform account
 - Eventbrite API credentials
 - POAP API access
+```
 
 ### Installation
 
 ```bash
+# Clone the repositories
 git clone https://github.com/ofemeteng/eventsync-agent.git
+git clone https://github.com/ofemeteng/eventsync-frontend.git
+
+# Backend setup
 cd eventsync-agent
 pipx install poetry
 poetry install
+
+# Frontend setup
+cd ../eventsync-frontend
+npm install
 ```
 
 ### Configuration
 
-Create a `.env` file with the following:
-```
+Create a `.env` file:
+```env
 EVENTBRITE_API_KEY=your_eventbrite_key
 POAP_API_KEY=your_poap_api_key
 POAP_ACCESS_TOKEN=your_poap_access_token
@@ -86,41 +120,47 @@ CDP_API_KEY_NAME=your_cdp_api_key_name
 CDP_API_KEY_PRIVATE_KEY=your_cdp_api_key_private_key
 ```
 
-
-### Running the Web Application and Embedded Agent
+### Running the Application
 
 ```bash
+# Backend
 poetry shell
-uvicorn server:app --reload 
+uvicorn server:app --reload
+
+# Frontend
+npm run dev
 ```
-The application will be accessible at http:localhost:8000
 
+## 🎯 CDP Builder Grants Alignment
 
-## 🌟 Future Roadmap
+EventSync perfectly aligns with Round 3's focus on AgentKit implementations by:
+- ✅ Creating new, reusable AgentKit actions
+- ✅ Delivering an end-user facing application
+- ✅ Integrating Web2 and Web3 seamlessly
+- ✅ Enabling autonomous event management
+- ✅ Supporting ETH payments to event prize winners
 
-- [ ] Support for multiple event platforms
-- [ ] Advanced attendee analytics
-- [ ] Cross-platform event credential verification
-- [ ] Machine learning-powered event recommendations
+## 🔮 Future Development
+
+- [ ] AI-powered event recommendations
+- [ ] Stablecoin payment integration
+- [ ] Cross-platform event verification
+- [ ] Advanced analytics dashboard
 
 ## 🤝 Contributing
 
-Interested in improving EventSync? We welcome contributions!
+We welcome contributions! Please follow these steps:
 
 1. Fork the repository
 2. Create your feature branch
 3. Commit your changes
 4. Push to the branch
-5. Create a new Pull Request
+5. Submit a Pull Request
 
 ## 📄 License
 
-MIT License - Empowering autonomous event management worldwide.
+MIT License - See LICENSE file for details.
 
 ---
 
-### 🏅 Hackathon Impact
-
-EventSync demonstrates the transformative potential of AI agents in bridging digital ecosystems, making blockchain technologies more accessible and user-friendly.
-
-**Built with 💖 for the Gaia Autonomous Hackathon**
+Built with 💝 using Coinbase Developer Platform's AgentKit | [Documentation](https://docs.example.com/eventsync)

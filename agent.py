@@ -2,6 +2,7 @@ import json
 import os
 import sys
 import time
+from typing import Optional
 import requests
 
 from dotenv import load_dotenv
@@ -28,7 +29,7 @@ wallet_data_file = "wallet_data_sepolia.txt"
 # Load credentials from environment variables
 poap_api_key = os.getenv("POAP_API_KEY")
 poap_access_token = os.getenv("POAP_ACCESS_TOKEN")
-eventbrite_auth_token = os.getenv("EVENTBRITE_API_KEY")
+eventbrite_auth_token = os.getenv("EVENTBRITE_OAUTH_TOKEN")
 
 MINT_POAP_PROMPT = """
 This tool mints a POAP to an attendee using the POAP API. It requires the attendee's address (Ethereum address, ENS, or email), the claim code (qr_hash), and the claim secret.
@@ -323,6 +324,148 @@ def list_attendees(event_id: str) -> str:
         return f"Failed to retrieve attendees. Status Code: {response.status_code}. Error: {response.json()}"
 
 
+CREATE_EVENT_PROMPT = """
+This tool creates a new Eventbrite event for a specified organization. It can create either a single event or 
+set up a series parent for recurring events. You must provide the organization ID, event name, start and end times,
+and other event details.
+You can make requests like:
+- "Create an event for organization 12345 called 'Tech Summit'"
+- "Set up a virtual conference for org 67890"
+- "Create an in-person workshop event for organization 112233"
+Always make sure to provide the organization ID and essential event details.
+"""
+
+
+class CreateEventInput(BaseModel):
+    """Input argument schema for creating an Eventbrite event."""
+
+    organization_id: str = Field(
+        ..., description="ID of the Organization that owns the Event", example="12345"
+    )
+    name: str = Field(
+        ..., description="The name/title of the event", example="Tech Conference 2025"
+    )
+    start_time: str = Field(
+        ...,
+        description="Event start time in ISO format (YYYY-MM-DDTHH:MM:SS)",
+        example="2025-06-01T09:00:00",
+    )
+    end_time: str = Field(
+        ...,
+        description="Event end time in ISO format (YYYY-MM-DDTHH:MM:SS)",
+        example="2025-06-01T17:00:00",
+    )
+    timezone: str = Field(
+        ..., description="Timezone for the event", example="America/Los_Angeles"
+    )
+    description: Optional[str] = Field(
+        None,
+        description="Detailed description of the event",
+        example="Join us for a day of technical talks and networking",
+    )
+    is_online: bool = Field(False, description="Whether this is an online event")
+    venue_id: Optional[str] = Field(
+        None,
+        description="ID of the venue where the event will be held (not required for online events)",
+        example="54321",
+    )
+    is_series: bool = Field(
+        False, description="Whether this event is a series parent for recurring events"
+    )
+
+
+def create_event(
+    organization_id: str,
+    name: str,
+    start_time: str,
+    end_time: str,
+    timezone: str,
+    description: Optional[str] = None,
+    is_online: bool = False,
+    venue_id: Optional[str] = None,
+    is_series: bool = False,
+    eventbrite_auth_token: str = None,
+) -> str:
+    """
+    Creates a new Eventbrite event using the Eventbrite API.
+
+    Args:
+        organization_id (str): ID of the Organization that owns the Event
+        name (str): The name/title of the event
+        start_time (str): Event start time in ISO format
+        end_time (str): Event end time in ISO format
+        timezone (str): Timezone for the event
+        description (Optional[str]): Detailed description of the event
+        is_online (bool): Whether this is an online event
+        venue_id (Optional[str]): ID of the venue where the event will be held
+        is_series (bool): Whether this event is a series parent for recurring events
+        eventbrite_auth_token (str): Eventbrite API authentication token
+
+    Returns:
+        str: A message containing the created event details or error message
+
+    Raises:
+        ValueError: If incompatible options are provided
+    """
+    # Validate incompatible options
+    if is_online and venue_id:
+        raise ValueError("Event cannot be both online and have a venue")
+
+    # Construct the API endpoint URL
+    url = f"https://www.eventbriteapi.com/v3/organizations/{organization_id}/events/"
+
+    # Set up the headers
+    headers = {
+        "Authorization": f"Bearer {eventbrite_auth_token}",
+        "Content-Type": "application/json",
+    }
+
+    # Construct the event data payload
+    event_data = {
+        "event": {
+            "name": {"html": name},
+            "description": {"html": description} if description else None,
+            "start": {"timezone": timezone, "utc": start_time},
+            "end": {"timezone": timezone, "utc": end_time},
+            "online_event": is_online,
+            "is_series": is_series,
+            "venue_id": venue_id if venue_id else None,
+            "currency": "USD",  # Default currency
+            "listed": True,  # Make the event publicly listed
+            "shareable": True,  # Allow sharing
+            "invite_only": False,
+            "show_remaining": True,
+            "capacity": 100,  # Default capacity
+        }
+    }
+
+    try:
+        # Make the API call
+        response = requests.post(url, headers=headers, json=event_data)
+
+        # Handle the response
+        if response.status_code == 200:
+            event_data = response.json()
+            event_id = event_data.get("id")
+            event_url = event_data.get("url")
+            return (
+                f"Successfully created {'series parent' if is_series else 'event'} "
+                f"with ID {event_id} for organization {organization_id}.\n"
+                f"Event '{name}' scheduled from {start_time} to {end_time} ({timezone}).\n"
+                f"Event URL: {event_url}"
+            )
+        else:
+            error_detail = response.json().get("error_detail", "Unknown error")
+            return f"Failed to create event. Status Code: {response.status_code}. Error: {error_detail}"
+
+    except requests.exceptions.RequestException as e:
+        return f"Error making API request: {str(e)}"
+    except ValueError as e:
+        return f"Error with event data: {str(e)}"
+    except Exception as e:
+        return f"Unexpected error: {str(e)}"
+
+
 def initialize_agent():
     """Initialize the agent with CDP Agentkit."""
     # Initialize LLM.
@@ -365,9 +508,6 @@ def initialize_agent():
         func=retrieve_event,
     )
 
-    # Add the tool to the list of available tools.
-    all_tools = tools.append(retrieveEventTool)
-
     listAttendeesTool = CdpTool(
         name="list_attendees",
         description=LIST_ATTENDEES_PROMPT,
@@ -375,8 +515,6 @@ def initialize_agent():
         args_schema=ListAttendeesInput,
         func=list_attendees,
     )
-
-    all_tools = tools.append(listAttendeesTool)
 
     getClaimCodesTool = CdpTool(
         name="get_claim_codes",
@@ -386,8 +524,6 @@ def initialize_agent():
         func=get_claim_codes,
     )
 
-    all_tools = tools.append(getClaimCodesTool)
-
     getClaimSecretTool = CdpTool(
         name="get_claim_secret",
         description=GET_CLAIM_SECRET_PROMPT,
@@ -395,8 +531,6 @@ def initialize_agent():
         args_schema=GetClaimSecretInput,
         func=get_claim_secret,
     )
-
-    all_tools = tools.append(getClaimSecretTool)
 
     mintPoapTool = CdpTool(
         name="mint_poap",
@@ -406,7 +540,29 @@ def initialize_agent():
         func=mint_poap,
     )
 
-    all_tools = tools.append(mintPoapTool)
+    createEventbriteTool = CdpTool(
+        name="create_eventbrite_event",
+        description=CREATE_EVENT_PROMPT,
+        cdp_agentkit_wrapper=agentkit,
+        args_schema=CreateEventInput,
+        func=create_event,
+    )
+
+    # Add the tool to the list of available tools.
+    tools.append(
+        [
+            retrieveEventTool,
+            listAttendeesTool,
+            getClaimCodesTool,
+            getClaimSecretTool,
+            mintPoapTool,
+            createEventbriteTool,
+        ]
+    )
+    # all_tools = tools.append(listAttendeesTool)
+    # all_tools = tools.append(getClaimCodesTool)
+    # all_tools = tools.append(getClaimSecretTool)
+    # all_tools = tools.append(mintPoapTool)
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()
