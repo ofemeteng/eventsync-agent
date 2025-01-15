@@ -28,10 +28,10 @@ class Query(BaseModel):
 agent_executor, config = initialize_agent()
 
 
-# Redirect root URL to the static HTML page
+# Redirect root URL to the GitHub repo
 @app.get("/")
 async def serve_index():
-    return RedirectResponse(url="/static/index.html")
+    return RedirectResponse(url="https://github.com/ofemeteng/eventsync-agent")
 
 
 @app.post("/chat")

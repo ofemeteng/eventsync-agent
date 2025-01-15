@@ -332,12 +332,18 @@ You can make requests like:
 - "Create an event for organization 12345 called 'Tech Summit'"
 - "Set up a virtual conference for org 67890"
 - "Create an in-person workshop event for organization 112233"
-Always make sure to provide the organization ID and essential event details.
+Always make sure to provide the organization ID and all required event details.
 """
 
 
 class CreateEventInput(BaseModel):
-    """Input argument schema for creating an Eventbrite event."""
+    """Input argument schema for creating an Eventbrite event.
+    - organization_id is required
+    - name is required
+    - start_time is required
+    - end_time is required
+    - timezone is required
+    """
 
     organization_id: str = Field(
         ..., description="ID of the Organization that owns the Event", example="12345"
@@ -384,7 +390,6 @@ def create_event(
     is_online: bool = False,
     venue_id: Optional[str] = None,
     is_series: bool = False,
-    eventbrite_auth_token: str = None,
 ) -> str:
     """
     Creates a new Eventbrite event using the Eventbrite API.
@@ -399,7 +404,6 @@ def create_event(
         is_online (bool): Whether this is an online event
         venue_id (Optional[str]): ID of the venue where the event will be held
         is_series (bool): Whether this event is a series parent for recurring events
-        eventbrite_auth_token (str): Eventbrite API authentication token
 
     Returns:
         str: A message containing the created event details or error message
@@ -407,6 +411,7 @@ def create_event(
     Raises:
         ValueError: If incompatible options are provided
     """
+
     # Validate incompatible options
     if is_online and venue_id:
         raise ValueError("Event cannot be both online and have a venue")
@@ -443,8 +448,10 @@ def create_event(
         # Make the API call
         response = requests.post(url, headers=headers, json=event_data)
 
+
         # Handle the response
         if response.status_code == 200:
+            print("SUCCCESSFULLLLLL")
             event_data = response.json()
             event_id = event_data.get("id")
             event_url = event_data.get("url")
@@ -549,20 +556,12 @@ def initialize_agent():
     )
 
     # Add the tool to the list of available tools.
-    tools.append(
-        [
-            retrieveEventTool,
-            listAttendeesTool,
-            getClaimCodesTool,
-            getClaimSecretTool,
-            mintPoapTool,
-            createEventbriteTool,
-        ]
-    )
-    # all_tools = tools.append(listAttendeesTool)
-    # all_tools = tools.append(getClaimCodesTool)
-    # all_tools = tools.append(getClaimSecretTool)
-    # all_tools = tools.append(mintPoapTool)
+    tools.append(createEventbriteTool)
+    tools.append(retrieveEventTool)
+    tools.append(listAttendeesTool)
+    tools.append(getClaimCodesTool)
+    tools.append(getClaimSecretTool)
+    tools.append(mintPoapTool)
 
     # Store buffered conversation history in memory.
     memory = MemorySaver()

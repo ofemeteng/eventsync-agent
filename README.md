@@ -1,7 +1,7 @@
 # 🚀 EventSync: The Ultimate Web2 & Web3 Event Management Agent
 
 ## 🏆 Round 3 CDP Builder Grants Submission | AgentKit Edition
-*Building on our success as winners of the Best CDP AgentKit Integration (Coinbase Developer Platform Bounty) at the [Gaia Autonomous Hackathon (December 2024)](https://www.gaianet.ai/blog/gaia-first-autonomous-hackathon)*
+*Building on our success as one of the winners of the Best CDP AgentKit Integration (Coinbase Developer Platform Bounty) at the [Gaia Autonomous Hackathon (December 2024)](https://www.gaianet.ai/blog/gaia-first-autonomous-hackathon)*
 
 ![Agent Integration Showcase](./images/eventsync.png)
 
@@ -111,13 +111,17 @@ npm install
 
 ### Configuration
 
-Create a `.env` file:
+Create separate `.env` files for the backend and frontend:
 ```env
-EVENTBRITE_API_KEY=your_eventbrite_key
+# Backend
+EVENTBRITE_OAUTH_TOKEN=your_eventbrite_oauth_token
 POAP_API_KEY=your_poap_api_key
 POAP_ACCESS_TOKEN=your_poap_access_token
 CDP_API_KEY_NAME=your_cdp_api_key_name
 CDP_API_KEY_PRIVATE_KEY=your_cdp_api_key_private_key
+
+#Frontend
+NEXT_PUBLIC_API_BASE_URL=the_base_url_of_the_eventsync_backend_agent
 ```
 
 ### Running the Application
