@@ -1,7 +1,11 @@
 # 🚀 EventSync: The Ultimate Web2 & Web3 Event Management Agent
 
 ## 🏆 Round 3 CDP Builder Grants Submission | AgentKit Edition
-*Building on our success as one of the winners of the Best CDP AgentKit Integration (Coinbase Developer Platform Bounty) at the [Gaia Autonomous Hackathon (December 2024)](https://www.gaianet.ai/blog/gaia-first-autonomous-hackathon)*
+*Building on our success as one of the winners of the Best CDP AgentKit Integration (Coinbase Developer Platform Bounty) at the [Gaia Autonomous Hackathon (December 2024)](https://www.gaianet.ai/blog/gaia-first-autonomous-hackathon), EventSync has added new features and capabilities.*
+
+> [Live App](https://eventsync.replit.app)
+
+> [YouTube Demonstration]()
 
 ![Agent Integration Showcase](./images/eventsync.png)
 
