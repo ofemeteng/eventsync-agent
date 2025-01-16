@@ -1,4 +1,3 @@
-import json
 import os
 import sys
 import time
@@ -364,20 +363,6 @@ class CreateEventInput(BaseModel):
     timezone: str = Field(
         ..., description="Timezone for the event", example="America/Los_Angeles"
     )
-    description: Optional[str] = Field(
-        None,
-        description="Detailed description of the event",
-        example="Join us for a day of technical talks and networking",
-    )
-    is_online: bool = Field(False, description="Whether this is an online event")
-    venue_id: Optional[str] = Field(
-        None,
-        description="ID of the venue where the event will be held (not required for online events)",
-        example="54321",
-    )
-    is_series: bool = Field(
-        False, description="Whether this event is a series parent for recurring events"
-    )
 
 
 def create_event(
@@ -386,10 +371,6 @@ def create_event(
     start_time: str,
     end_time: str,
     timezone: str,
-    description: Optional[str] = None,
-    is_online: bool = False,
-    venue_id: Optional[str] = None,
-    is_series: bool = False,
 ) -> str:
     """
     Creates a new Eventbrite event using the Eventbrite API.
@@ -400,10 +381,6 @@ def create_event(
         start_time (str): Event start time in ISO format
         end_time (str): Event end time in ISO format
         timezone (str): Timezone for the event
-        description (Optional[str]): Detailed description of the event
-        is_online (bool): Whether this is an online event
-        venue_id (Optional[str]): ID of the venue where the event will be held
-        is_series (bool): Whether this event is a series parent for recurring events
 
     Returns:
         str: A message containing the created event details or error message
@@ -411,10 +388,6 @@ def create_event(
     Raises:
         ValueError: If incompatible options are provided
     """
-
-    # Validate incompatible options
-    if is_online and venue_id:
-        raise ValueError("Event cannot be both online and have a venue")
 
     # Construct the API endpoint URL
     url = f"https://www.eventbriteapi.com/v3/organizations/{organization_id}/events/"
@@ -429,18 +402,9 @@ def create_event(
     event_data = {
         "event": {
             "name": {"html": name},
-            "description": {"html": description} if description else None,
             "start": {"timezone": timezone, "utc": start_time},
             "end": {"timezone": timezone, "utc": end_time},
-            "online_event": is_online,
-            "is_series": is_series,
-            "venue_id": venue_id if venue_id else None,
             "currency": "USD",  # Default currency
-            "listed": True,  # Make the event publicly listed
-            "shareable": True,  # Allow sharing
-            "invite_only": False,
-            "show_remaining": True,
-            "capacity": 100,  # Default capacity
         }
     }
 
@@ -448,15 +412,13 @@ def create_event(
         # Make the API call
         response = requests.post(url, headers=headers, json=event_data)
 
-
         # Handle the response
         if response.status_code == 200:
-            print("SUCCCESSFULLLLLL")
             event_data = response.json()
             event_id = event_data.get("id")
             event_url = event_data.get("url")
             return (
-                f"Successfully created {'series parent' if is_series else 'event'} "
+                f"Successfully created event "
                 f"with ID {event_id} for organization {organization_id}.\n"
                 f"Event '{name}' scheduled from {start_time} to {end_time} ({timezone}).\n"
                 f"Event URL: {event_url}"

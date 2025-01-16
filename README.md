@@ -119,6 +119,8 @@ POAP_API_KEY=your_poap_api_key
 POAP_ACCESS_TOKEN=your_poap_access_token
 CDP_API_KEY_NAME=your_cdp_api_key_name
 CDP_API_KEY_PRIVATE_KEY=your_cdp_api_key_private_key
+POAP_CLIENT_ID=your_poap_client_id
+POAP_CLIENT_SECRET=your_poap_client_secret
 
 #Frontend
 NEXT_PUBLIC_API_BASE_URL=the_base_url_of_the_eventsync_backend_agent
