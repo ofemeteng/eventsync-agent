@@ -5,7 +5,7 @@
 
 > [Live App](https://eventsync.replit.app)
 
-> [YouTube Demonstration]()
+> [YouTube Demonstration](https://youtu.be/KOTnGen4IbU)
 
 ![Agent Integration Showcase](./images/eventsync.png)
 
@@ -148,7 +148,6 @@ EventSync perfectly aligns with Round 3's focus on AgentKit implementations by:
 - ✅ Delivering an end-user facing application
 - ✅ Integrating Web2 and Web3 seamlessly
 - ✅ Enabling autonomous event management
-- ✅ Supporting ETH payments to event prize winners
 
 ## 🔮 Future Development
 
@@ -156,6 +155,7 @@ EventSync perfectly aligns with Round 3's focus on AgentKit implementations by:
 - [ ] Stablecoin payment integration
 - [ ] Cross-platform event verification
 - [ ] Advanced analytics dashboard
+- [ ] Supporting stablecoin payments to event prize winners
 
 ## 🤝 Contributing
 
